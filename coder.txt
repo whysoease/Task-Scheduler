@@ -1,0 +1,45 @@
+class TaskScheduler {
+  constructor() {
+    this.tasks = [];
+    this.timer = null;
+  }
+
+  scheduleTask(task, delay) {
+    const taskObj = { task, delay };
+    this.tasks.push(taskObj);
+    if (!this.timer) {
+      this.startTimer();
+    }
+    return taskObj;
+  }
+
+  startTimer() {
+    if (!this.tasks.length) return;
+    const nextTask = this.tasks[0];
+    const { task, delay } = nextTask;
+    this.timer = setTimeout(() => {
+      task();
+      this.tasks.shift();
+      this.startTimer();
+    }, delay);
+  }
+
+  cancelTask(taskObj) {
+    const index = this.tasks.indexOf(taskObj);
+    if (index !== -1) {
+      this.tasks.splice(index, 1);
+      if (!this.tasks.length) {
+        clearTimeout(this.timer);
+        this.timer = null;
+      }
+    }
+  }
+
+  clearAllTasks() {
+    clearTimeout(this.timer);
+    this.timer = null;
+    this.tasks = [];
+  }
+}
+
+module.exports = TaskScheduler;
